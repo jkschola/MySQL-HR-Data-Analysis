@@ -1,53 +1,33 @@
-# Creating Database named Projects 
-DROP  DATABASE IF EXISTS Projects ;
+-- Creating Database named Projects
+DROP DATABASE IF EXISTS Projects;
+CREATE DATABASE Projects;
 
-CREATE DATABASE Projects; 
+-- Use the Projects database
+USE Projects;
 
-# Import HR data from a CSV file using Table Data Import wizard
-/* 	- Expand "Projects" DB
-	- Right clic on "Tables" then select "Table Data Import Wizard"
-	- Browser the File Path
-    - Renamed Table to "HR"
-*/
+-- Assuming you have imported HR data from a CSV file into a table named HR using Table Data Import wizard
 
-USE Projects; 
-
+-- Display all data from HR table
 SELECT * FROM HR;
 
-# Rename ï»¿id column to emp_id
-
+-- Rename ï»¿id column to emp_id
 ALTER TABLE HR
-CHANGE COLUMN ï»¿id emp_id VARCHAR(20) ;
+CHANGE COLUMN ï»¿id emp_id VARCHAR(20);
 
-# Check data types of all columns
-
+-- Check data types of all columns
 DESCRIBE HR;
 
-# CHANGE & FORMAT dates values
-
-/* In this dataset we have 3 columns containing dates values : 
-	- birthdate		Formated as 06-29-1984 (%m-%d-%Y) and 6/29/1984 (%m/%d/%Y)
-    - hire_date		Formated as birthdate
-    - termdate		Formated as 2018-07-01 03:10:13 UTC (%Y-%m-%d %h:%i:%s UTC) : date time
-We will use CASE statement with :
-	STR_TO_DATE() to convert dates text (string) values to date data type formated as MySQL standard date format (%Y-%m-%d)
-You can use :
-	DATE_FORMAT() to change date format from MySQL standard date format (%Y-%m-%d) to your specific format (eg : %d-%m-%Y)
-*/
+-- Change & format date values
 /*
-# Testing formats before UPDATING
-SELECT STR_TO_DATE('21, 07, 2023', '%d, %m, %Y') AS New_form;							-- Output : '2023-07-21'
-SELECT STR_TO_DATE('6/29/1984', '%m/%d/%Y') AS New_form;								-- Output : '1984-06-29'
-SELECT STR_TO_DATE('06-29-1984', '%m-%d-%Y') AS New_form; 								-- Output : '1984-06-29'
-SELECT STR_TO_DATE('06-29-84', '%m-%d-%Y') AS New_form;									-- Output : '1984-06-29'
-SELECT STR_TO_DATE('2018-07-01 15:10:13 UTC', '%Y-%m-%d %H:%i:%s UTC') AS New_form ;	-- Output : '2018-07-01 15:10:13'
-SELECT STR_TO_DATE('2018-07-01 15:10:13 UTC', '%Y-%m-%d %H:%i:%s') AS New_form ;		-- Output : '2018-07-01 15:10:13'
-SELECT STR_TO_DATE('2018-07-01 15:10:13 UTC', '%Y-%m-%d') AS New_form ;					-- Output : '2018-07-01'
-SELECT STR_TO_DATE('', '%Y-%m-%d') AS New_form ;										-- Output : NULL
+In this dataset, we have 3 columns containing date values:
+  - birthdate: Formatted as MM-DD-YYYY or MM/DD/YYYY
+  - hire_date: Formatted as MM-DD-YYYY or MM/DD/YYYY
+  - termdate: Formatted as YYYY-MM-DD HH:MM:SS UTC
+
+We will use CASE statements with STR_TO_DATE() to convert date text values to the MySQL standard date format (YYYY-MM-DD).
 */
 
-# birthdate 
-
+-- birthdate
 UPDATE HR 
 SET 
     birthdate = CASE
@@ -56,8 +36,7 @@ SET
         ELSE NULL
     END;
 
-# hire_date
-
+-- hire_date
 UPDATE HR 
 SET 
     hire_date = CASE
@@ -66,32 +45,27 @@ SET
         ELSE NULL
     END;
 
-SELECT * FROM HR; 
+SELECT * FROM HR;
 
-# termdate
-
+-- termdate
 UPDATE HR 
 SET 
     termdate = DATE(STR_TO_DATE(termdate, '%Y-%m-%d %H:%i:%s UTC'))
 WHERE
     termdate IS NOT NULL AND termdate != '';
 
-SELECT @@autocommit ; -- check the state of autocommit '0' = OFF; '1' = ON : ROLLBACK can't work iff ON
+SELECT @@autocommit; -- Check the state of autocommit ('0' = OFF; '1' = ON)
 
-
-# CONVERT dates values (text) to DATE data type
+-- Convert date values (text) to DATE data type
+ALTER TABLE HR
+MODIFY COLUMN birthdate DATE;
 
 ALTER TABLE HR
-MODIFY COLUMN birthdate DATE ;
+MODIFY COLUMN hire_date DATE;
 
 ALTER TABLE HR
-MODIFY COLUMN hire_date DATE ;
-
-ALTER TABLE HR
-MODIFY COLUMN termdate DATE ; 
-/* With this query, I faced this Error : (Incorrect date value: '' for column 'termdate')
-To resolve this, update empty string to 'NULL' then ALTER Table again
-*/
+MODIFY COLUMN termdate DATE; 
+-- To resolve the error: (Incorrect date value: '' for column 'termdate'), update empty strings to 'NULL'
 UPDATE HR 
 SET 
     termdate = NULL
@@ -99,175 +73,117 @@ WHERE
     termdate = '';
 
 ALTER TABLE HR
-MODIFY COLUMN termdate DATE ;
+MODIFY COLUMN termdate DATE;
 
-SELECT * FROM HR;  
+SELECT * FROM HR;
 
-# ADD Age Column
-
--- Add a new column named "Age" to the "HR" table
+-- Add Age column
 ALTER TABLE HR
 ADD COLUMN Age INT;
 
--- Update the "Age" column with the calculated ages
+-- Update the Age column with the calculated ages
 UPDATE HR 
 SET 
-    Age = TIMESTAMPDIFF(YEAR,
-        birthdate,
-        CURDATE());
+    Age = TIMESTAMPDIFF(YEAR, birthdate, CURDATE());
 
 SELECT emp_id, first_name, last_name, birthdate, Age
 FROM HR
 WHERE Age < 0;
 
-/* 
+-- Correct negative ages
+/*
 There are 967 records with Age < 0.
-After investigating the dataset, rows with Age < 0, have birthdate like '2066-01-07' maybe instead of '1966-01-07'
-Based on the information provided by the Business Domain Experts, We can either :
+After investigating the dataset, rows with Age < 0 have birthdates like '2066-01-07' instead of '1966-01-07'.
 
-	-- EXCLUDE those negative values :
-		CREATE TABLE HR_Positive_Age AS SELECT * FROM
-			HR
-		WHERE
-			AGE >= 0;
-            
-    -- Data IMPUTATION : Replace negative ages by NULL or default value :
-		UPDATE HR 
-		SET 
-			Age = CASE
-				WHEN Age >= 0 THEN Age
-				ELSE NULL
-			END;
-            
-	-- Update birthdate where Age < 0  from '2066-01-07' to '1966-01-07':
-	UPDATE HR 
-	SET 
-		birthdate = DATE_ADD(birthdate, INTERVAL - 100 YEAR)
-	WHERE
-		Age < 0;
-
-	-- Then Recalculate Age :
-	UPDATE HR 
-	SET 
-		Age = TIMESTAMPDIFF(YEAR,
-			birthdate,
-			CURDATE());
+Based on the information provided by the Business Domain Experts, we can either:
+1. Exclude those negative values.
+2. Impute data: Replace negative ages with NULL or a default value.
+3. Correct the birthdates by subtracting 100 years and recalculate Age.
 */
 
+-- Option 3: Correct the birthdates and recalculate Age
+UPDATE HR 
+SET 
+    birthdate = DATE_ADD(birthdate, INTERVAL -100 YEAR)
+WHERE
+    Age < 0;
+
+UPDATE HR 
+SET 
+    Age = TIMESTAMPDIFF(YEAR, birthdate, CURDATE());
+
+-- Summary statistics for Age
 SELECT 
     MIN(Age) AS Youngest, MAX(Age) AS Oldest
-FROM
-    HR
-WHERE
-    Age > 0;
-    
+FROM HR
+WHERE Age > 0;
+
 SELECT 
     COUNT(*)
-FROM
-    HR
-WHERE
-    Age > 0 AND Age < 18;
+FROM HR
+WHERE Age > 0 AND Age < 18;
 
-
+-- Check for termdates in the future
 SELECT 
     *
-FROM
-    HR
-WHERE
-    termdate > CURDATE();
+FROM HR
+WHERE termdate > CURDATE();
 
-/* 
-There are 1533 records with termdate > CURDATE(),
-Maybe their contract will end in the future or there is some error in data entry
-
-
+/*
+There are 1533 records with termdate > CURDATE.
+These could indicate future terminations or data entry errors.
 */
 
--- Identify Current Employees (19818)
+-- Identify current employees (those with no termination date or a future termination date)
 SELECT 
     *
-FROM
-    HR
-WHERE
-    termdate > CURDATE() OR termdate IS NULL;
+FROM HR
+WHERE termdate > CURDATE() OR termdate IS NULL;
 
-
--- Termination Trends Over Time (Including Future Terminations)
+-- Termination trends over time (including future terminations)
 SELECT 
     YEAR(termdate) AS Termination_Year,
     COUNT(*) AS Termination_Count
-FROM
-    HR
-WHERE
-    termdate IS NOT NULL
+FROM HR
+WHERE termdate IS NOT NULL
 GROUP BY YEAR(termdate)
 ORDER BY Termination_Year;
 
--- Termination Trends Over Time (Future Terminations)
+-- Termination trends over time (future terminations)
 SELECT 
     YEAR(termdate) AS Termination_Year,
     COUNT(*) AS Termination_Count
-FROM
-    HR
-WHERE
-    (termdate > CURDATE())
+FROM HR
+WHERE termdate > CURDATE()
 GROUP BY YEAR(termdate)
 ORDER BY Termination_Year;
 
--- Retention Analysis (Tenure in Years, Rounded to Integer)
+-- Retention analysis (tenure in years, rounded to integer)
 SELECT 
     emp_id,
     ROUND(DATEDIFF(IFNULL(termdate, CURDATE()), hire_date) / 365) AS Tenure_Years
-FROM
-    HR;
+FROM HR;
 
--- Average Tenure in Years
+-- Average tenure in years
 SELECT 
-    ROUND(AVG((DATEDIFF(IFNULL(termdate, CURDATE()), hire_date) / 365))) AS Average_Tenure_Years
-FROM
-    HR;
+    ROUND(AVG(DATEDIFF(IFNULL(termdate, CURDATE()), hire_date) / 365)) AS Average_Tenure_Years
+FROM HR;
 
-
-
-/*
--- Employee Turnover Rate:
-SELECT 
-    (COUNT(*) / (SELECT 
-            COUNT(*)
-        FROM
-            HR)) * 100 AS Turnover_Rate
-FROM
-    HR
-WHERE
-    termdate IS NOT NULL OR termdate IS NULL;
-*/
-
-
--- Number of Current Employees Over Years
--- Number of Current Employees Over Previous Years
--- Number of Current Employees Over Years
--- Count of Employees for a Specific Year
--- Count of Employees Over Multiple Years
-
--- Hiring Trends Over Time:
+-- Hiring trends over time
 SELECT 
     YEAR(hire_date) AS Hire_Year, COUNT(*) AS Hires_Count
-FROM
-    HR
+FROM HR
 GROUP BY Hire_Year
 ORDER BY Hire_Year;
 
--- Most Common Hiring Months:
+-- Most common hiring months
 SELECT 
     MONTHNAME(hire_date) AS Hire_Month, COUNT(*) AS Hires_Count
-FROM
-    HR
+FROM HR
 GROUP BY Hire_Month
 ORDER BY Hires_Count DESC;
 
+-- List all departments
 SELECT DISTINCT
     department
-FROM
-    HR;
-
-
+FROM HR;
