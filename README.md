@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project involves analyzing HR data from the year 2000 to 2020. The dataset contains over 22,000 rows. The project includes data cleaning and querying to answer specific HR-related questions.
+This project involves analyzing HR data. The dataset contains over 22,000 rows. The project includes data cleaning and querying to answer specific HR-related questions.
 
 
 ## Files Description
@@ -40,6 +40,7 @@ This project involves analyzing HR data from the year 2000 to 2020. The dataset 
 11. What is the tenure distribution for each department?
 
 ## Summary of Findings
+
  - There are more male employees
  - White race is the most dominant while Native Hawaiian and American Indian are the least dominant.
  - The youngest employee is 20 years old and the oldest is 57 years old
