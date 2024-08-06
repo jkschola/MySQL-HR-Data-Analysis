@@ -54,7 +54,6 @@ This project involves analyzing HR data from the year 2000 to 2020. The dataset 
 
 ## Limitations
 
-- Some records had negative ages. There are 967 records with Age < 0.
-After investigating the dataset, rows with Age < 0 have birthdates like '2066-01-07' instead of '1966-01-07'. I Corrected the birthdates by subtracting 100 years and recalculate Age.
+- Some records had negative ages. There are 967 records with Age < 0, they have birthdates like '2066-01-07' instead of '1966-01-07'. I Corrected the birthdates by subtracting 100 years and recalculate Age.
 
 - Some termdates were far into the future and were not included in the analysis(1599 records). The only term dates used were those less than or equal to the current date.
