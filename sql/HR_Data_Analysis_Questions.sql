@@ -62,8 +62,9 @@ FROM
 WHERE
     Age > 0
 GROUP BY Age_Group
-ORDER BY Age_Group ASC;    
-    
+ORDER BY Age_Group ASC;
+
+-- Age and gender distribution in specific age groups
 SELECT 
     CASE
         WHEN Age < 25 THEN '18-24'
@@ -79,8 +80,8 @@ FROM
     HR
 WHERE
     Age > 0
-GROUP BY Age_Group , gender
-ORDER BY Age_Group , gender;     
+GROUP BY Age_Group, gender
+ORDER BY Age_Group, gender;
 
 -- 4. How many employees work at headquarters versus remote locations?
 SELECT 
