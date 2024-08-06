@@ -4,7 +4,6 @@
 
 This project involves analyzing HR data from the year 2000 to 2020. The dataset contains over 22,000 rows. The project includes data cleaning and querying to answer specific HR-related questions.
 
-## Directory Structure
 
 ## Files Description
 
