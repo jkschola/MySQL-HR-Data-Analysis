@@ -143,6 +143,7 @@ GROUP BY jobtitle
 ORDER BY Employees_Count DESC;
 
 -- 8. Which department has the highest turnover rate?
+
 -- Count of active employees (current year)
 SELECT 
     COUNT(*) AS CY_Employees
