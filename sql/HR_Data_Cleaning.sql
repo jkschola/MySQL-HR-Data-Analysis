@@ -1,3 +1,4 @@
+
 -- Creating Database named Projects
 DROP DATABASE IF EXISTS Projects;
 CREATE DATABASE Projects;
