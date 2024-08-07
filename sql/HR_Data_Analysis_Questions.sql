@@ -1,7 +1,9 @@
 USE Projects;
 
 # QUESTIONS
+
 -- 1. What is the gender breakdown of employees in the company?
+
 SELECT 
     gender, COUNT(*) AS Employees_Count
 FROM
@@ -10,6 +12,7 @@ GROUP BY gender
 ORDER BY Employees_Count DESC;
 
 -- 2. What is the race/ethnicity breakdown of employees in the company?
+
 SELECT 
     race, COUNT(*) AS Employees_Count
 FROM
@@ -84,6 +87,7 @@ GROUP BY Age_Group, gender
 ORDER BY Age_Group, gender;
 
 -- 4. How many employees work at headquarters versus remote locations?
+
 SELECT 
     location, COUNT(*) AS Employees_Count
 FROM
@@ -93,6 +97,7 @@ WHERE
 GROUP BY location;
 
 -- 5. What is the average length of employment for employees who have been terminated?
+
 -- Average tenure in years (method 1)
 SELECT 
     FLOOR(AVG(DATEDIFF(termdate, hire_date) / 365.25)) AS Avg_Tenure_Years
@@ -112,6 +117,7 @@ WHERE
     AND termdate < CURDATE();
 
 -- 6. How does the gender distribution vary across departments and job titles?
+
 -- Gender distribution by department
 SELECT 
     department, gender, COUNT(*) AS Employees_Count
