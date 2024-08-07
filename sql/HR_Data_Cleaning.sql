@@ -102,6 +102,7 @@ Based on the information provided by the Business Domain Experts, we can either:
 */
 
 -- Option 3: Correct the birthdates and recalculate Age
+
 UPDATE HR 
 SET 
     birthdate = DATE_ADD(birthdate, INTERVAL -100 YEAR)
