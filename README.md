@@ -40,6 +40,7 @@ This project involves analyzing HR data. The dataset contains over 22,000 rows. 
 10. How has the company's employee count changed over time based on hire and term dates?
 11. What is the tenure distribution for each department?
 
+
 ## Summary of Findings
 
  - There are more male employees
