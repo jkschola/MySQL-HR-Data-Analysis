@@ -16,6 +16,7 @@ This project involves analyzing HR data. The dataset contains over 22,000 rows. 
 
 **Data Cleaning & Analysis** - MySQL Workbench
 
+
 ## Usage
 
 1. **Data Cleaning**:
